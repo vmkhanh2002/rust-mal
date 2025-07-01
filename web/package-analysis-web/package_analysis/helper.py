@@ -945,6 +945,8 @@ class Report:
         # Add Yara analysis
         try:
             from .src.yara.yara_manager import YaraRuleManager
+            from .src.yara.yara_manager import ReportYara
+
             yara_manager = YaraRuleManager()
             
             commands = [' '.join(cmd) for cmd in results['install']['commands']]
@@ -967,10 +969,16 @@ class Report:
                 if isinstance(syscall, str)
             ])
             
+            files_text = '\n'.join([
+                file for file in results['install']['files']['read'] + results['execute']['files']['read'] + results['install']['files']['write'] + results['execute']['files']['write'] + results['install']['files']['delete'] + results['execute']['files']['delete']
+                if isinstance(file, str)
+            ])
+            
             # Analyze with Yara rules
             command_matches = yara_manager.analyze_behavior(command_text)
             network_matches = yara_manager.analyze_behavior(dns_text)
             syscall_matches = yara_manager.analyze_behavior(syscall_text)
+            files_matches = yara_manager.analyze_behavior(files_text)
             
             # ref: https://github.com/chainguard-dev/malcontent/blob/9ede1b235b0b21cef84ff5d1bc075b68f651401f/pkg/report/report.go#L380
 
@@ -988,16 +996,46 @@ class Report:
             results['yara_analysis'] = {
                 'command_matches': [{
                     'rule': match.rule,
-                    'strings': [str(s) for s in match.strings]
+                    'strings': [str(s) for s in match.strings],
+                    'severity': match.meta['severity'],
+                    'description': match.meta['description'],
+                    'category': match.meta['category'],
+                    'author': match.meta['author'],
+                    'date': match.meta['date'],
+                    'evidence': ReportYara.extract_evidence(match, command_text),
+                    'url': ReportYara.generate_rule_url(match.namespace, match.rule)
                 } for match in command_matches],
                 'network_matches': [{
                     'rule': match.rule,
-                    'strings': [str(s) for s in match.strings]
+                    'strings': [str(s) for s in match.strings],
+                    'severity': match.meta['severity'],
+                    'description': match.meta['description'],
+                    'category': match.meta['category'],
+                    'author': match.meta['author'],
+                    'date': match.meta['date'],
+                    'evidence': ReportYara.extract_evidence(match, dns_text),
+                    'url': ReportYara.generate_rule_url(match.namespace, match.rule)
                 } for match in network_matches],
                 'syscall_matches': [{
                     'rule': match.rule,
-                    'strings': [str(s) for s in match.strings]
-                } for match in syscall_matches]
+                    'strings': [str(s) for s in match.strings],
+                    'severity': match.meta['severity'],
+                    'description': match.meta['description'],
+                    'category': match.meta['category'],
+                    'author': match.meta['author'],
+                    'date': match.meta['date'],
+                    'evidence': ReportYara.extract_evidence(match, syscall_text),
+                    'url': ReportYara.generate_rule_url(match.namespace, match.rule)
+                } for match in syscall_matches],
+                'files_matches': [{
+                    'rule': match.rule,
+                    'strings': [str(s) for s in match.strings],
+                    'severity': match.meta['severity'],
+                    'description': match.meta['description'],
+                    'category': match.meta['category'],
+                    'evidence': ReportYara.extract_evidence(match, files_text),
+                    'url': ReportYara.generate_rule_url(match.namespace, match.rule)
+                } for match in files_matches]
             }
 
             logger.info(results['yara_analysis'])

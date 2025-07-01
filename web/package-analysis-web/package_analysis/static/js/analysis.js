@@ -178,15 +178,21 @@ function populateDynamicSections(combinedReport) {
     const allYaraMatches = [
         ...(combinedReport.yara.command_matches || []),
         ...(combinedReport.yara.network_matches || []),
-        ...(combinedReport.yara.syscall_matches || [])
+        ...(combinedReport.yara.syscall_matches || []),
+        ...(combinedReport.yara.files_matches || []),
     ];
 
     allYaraMatches.forEach((match, index) => {
         yaraContent.innerHTML += `
             <tr>
-                <td>${index + 1}</td>
+                <td>${index + 1}</td> 
                 <td>${match.rule}</td>
-                <td>${match.strings.join(', ')}</td>
+                <td>${match.category}</td>
+                <td>${match.description}</td>
+                <td>${match.severity}</td>
+                <td>${match.evidence.join(', ')}</td>
+                <td><a href="${match.url}" target="_blank">${match.url}</a></td>
+
             </tr>
         `;
     });
