@@ -43,7 +43,7 @@ shell-backend:
 	docker-compose exec backend bash
 
 shell-db:
-	docker-compose exec database psql -U pakaremon -d packamal_prd
+	docker-compose exec database psql -U pakaremon -d packamal_dev
 
 migrate:
 	docker-compose exec backend python manage.py migrate
