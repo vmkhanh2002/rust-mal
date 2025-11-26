@@ -118,7 +118,7 @@ if [[ $# -eq 0 ]]; then
 	HELP=1
 fi
 
-DOCKER_OPTS=("run" "--cgroupns=host" "--privileged" "--rm")
+DOCKER_OPTS=("run" "--cgroupns=host" "--privileged" "--rm" "--cpus=2.0" "--memory=4g")
 
 # On development systems, we mount /var/lib/containers so that sandbox images can be
 # shared between the host system and the analysis image. However, this requires the

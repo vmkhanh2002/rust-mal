@@ -52,9 +52,9 @@ ptyprocess==0.7.0
 pycparser==2.22
 Pygments==2.19.1
 pyproject_hooks==1.2.0
-pyreadline3==3.5.4
+
 python-Levenshtein==0.27.1
-pywin32-ctypes==0.2.3
+
 PyYAML==6.0.2
 RapidFuzz==3.13.0
 requests==2.32.3
